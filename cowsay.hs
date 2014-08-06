@@ -5,7 +5,6 @@ import System.Environment
 import Control.Monad
 import Data.List
 import Data.List.Split
-import Data.Char (isSpace)
 
 data Options = Options {
     oThought :: String,
@@ -25,10 +24,18 @@ defaults = Options {
 }
 
 main = do
+    args <- getArgs
+    progName <- getProgName
+    case (length args) of 
+        0       -> putStrLn $ "Usage: " ++ progName ++ " < message >"
+        _       -> runProg defaults (head args)
+
+runProg :: Options -> String -> IO ()
+runProg opts thought = do
     cow <- readFile ("cows/default.cow")
     let fragCow = lines cow
         rewritten = rewriteCow defaults fragCow
-
+    putStrLn $ buildBubble thought (oWidth opts)
     mapM_ putStrLn rewritten
 
 getAll = do
@@ -64,7 +71,32 @@ replaceVar line index (opt, val)
     where 
         (pre, post) = splitAt (index + 1) line
 
---buildBubble 
+getBorder :: [a] -> Int -> [String]
+getBorder lns index
+    | length(lns) < 2           = [ "<", ">" ]
+    | index == 0                = [ "/", "\\" ]
+    | index == (length lns) - 1 = [ "\\", "/" ]
+    | otherwise                 = [ "|", "|" ]
+
+buildBubble :: String -> Int -> String
+buildBubble str maxL = 
+    intercalate "\n" (bubbleTop ++ (init $ helper nLns 0) ++ bubbleBottom)
+    where 
+        nLns = map (\x -> normalize x maxL) (textWrap str maxL)
+        bordersize = length $ head nLns
+        bubbleTop = [" " ++ (concat $ replicate bordersize "_")]
+        bubbleBottom = [" " ++ (concat $ replicate bordersize "-")]
+        helper lns index = 
+            case (index < length lns) of
+                True        -> [(border !! 0) ++ (lns !! index) ++ (border !! 1)] ++ (helper lns (index + 1))
+                False       -> [[]]
+            where
+                border = getBorder lns index
+
+normalize :: [Char] -> Int -> [Char]
+normalize ln maxL
+    | length ln < maxL      = ln ++ (concat $ replicate (maxL - length ln) " ")
+    | otherwise             = ln
 
 textWrap :: String -> Int -> [String]
 textWrap [] _ = []
@@ -74,6 +106,6 @@ textWrap str maxL = drop 1 $ reverse $ genSent zipped 0 [] [[]] maxL
         zipped = zip (map (\x -> length x) _words) _words
         genSent [] _ currSent sentences _ = currSent : sentences 
         genSent ws@(x:xs) currCount currSent sentences _max
-            | currCount + fst x < (_max - 2)    = genSent xs (currCount + fst x) (currSent ++ " " ++ snd x) sentences _max
-            | otherwise                   = genSent ws 0 [] (currSent : sentences) _max
+            | currCount + fst x < _max      = genSent xs (currCount + fst x + 1) (currSent ++ " " ++ snd x) sentences _max
+            | otherwise                     = genSent ws 0 [] (currSent : sentences) _max
 
