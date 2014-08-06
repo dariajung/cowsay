@@ -82,8 +82,9 @@ buildBubble :: String -> Int -> String
 buildBubble str maxL = 
     intercalate "\n" (bubbleTop ++ (init $ helper nLns 0) ++ bubbleBottom)
     where 
-        nLns = map (\x -> normalize x maxL) (textWrap str maxL)
-        bordersize = length $ head nLns
+        _nLns = (textWrap str maxL)
+        bordersize = length $ head _nLns
+        nLns = map (\x -> normalize x bordersize) _nLns
         bubbleTop = [" " ++ (concat $ replicate bordersize "_")]
         bubbleBottom = [" " ++ (concat $ replicate bordersize "-")]
         helper lns index = 
