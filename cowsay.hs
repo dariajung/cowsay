@@ -4,6 +4,7 @@ import System.Directory
 import System.Environment
 import Control.Monad
 import Data.List
+import Data.List.Split
 import Data.Char (isSpace)
 
 data Options = Options {
@@ -66,7 +67,13 @@ replaceVar line index (opt, val)
 --buildBubble 
 
 textWrap :: String -> Int -> [String]
-textWrap str maxL
-    | length str < maxL         = [str]
-    | otherwise                 = take maxL str : textWrap (drop maxL str) maxL
+textWrap [] _ = []
+textWrap str maxL = drop 1 $ reverse $ genSent zipped 0 [] [[]] maxL
+    where
+        _words = splitOn " " str
+        zipped = zip (map (\x -> length x) _words) _words
+        genSent [] _ currSent sentences _ = currSent : sentences 
+        genSent ws@(x:xs) currCount currSent sentences _max
+            | currCount + fst x < (_max - 2)    = genSent xs (currCount + fst x) (currSent ++ " " ++ snd x) sentences _max
+            | otherwise                   = genSent ws 0 [] (currSent : sentences) _max
 
