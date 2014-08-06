@@ -20,5 +20,5 @@ runhaskell cowsay.hs < message >
 Currently only supports the default cow. 
 
 ### LICENSE
-
+<br/>
 GNU General Public License
