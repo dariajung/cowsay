@@ -1,0 +1,17 @@
+##
+## Kitty cat.
+##
+$the_cow = <<EOC; 
+  $thoughts
+    $thoughts
+      $thoughts
+         /\__/\
+        /`    '\
+      === 0  0 ===
+        \  --  /
+       /        \
+      /          \
+     |            |
+      \  ||  ||  /
+       \_oo__oo_/#######o
+EOC

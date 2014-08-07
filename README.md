@@ -36,6 +36,7 @@ Available cows:
 - bong
 - bud-frogs
 - bunny
+- cat
 - cheese
 - cower
 - daemon
@@ -57,6 +58,7 @@ Available cows:
 - meow
 - milk
 - moofasa
+- moon-cat
 - moose
 - mutilated
 - ren
@@ -64,7 +66,6 @@ Available cows:
 - sheep
 - skeleton
 - small
-- sodomized
 - stegosaurus
 - stimpy
 - supermilker
