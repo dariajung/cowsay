@@ -137,8 +137,8 @@ textWrap str maxL = drop 1 $ reverse $ genSent zipped 0 [] [[]] maxL
     where
         _words = splitOn " " str
         zipped = zip (map (\x -> length x) _words) _words
-        genSent [] _ currSent sentences _ = currSent : sentences 
+        genSent [] _ currSent sentences _ = (currSent ++ " ") : sentences 
         genSent ws@(x:xs) currCount currSent sentences _max
             | currCount + fst x < _max      = genSent xs (currCount + fst x + 1) (currSent ++ " " ++ snd x) sentences _max
-            | otherwise                     = genSent ws 0 [] (currSent : sentences) _max
+            | otherwise                     = genSent ws 0 [] ((currSent ++ " ") : sentences) _max
 
