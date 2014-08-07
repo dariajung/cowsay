@@ -23,6 +23,7 @@ Flags:
 -T TONGUE  --tongue=TONGUE  Set cow's tongue
 -W WIDTH   --Width=WIDTH    Bubble width
 -f FILE    --File=FILE      Set cow file
+-h         --help           HALP WHAT DO I DO
 ```
 
 
