@@ -12,7 +12,7 @@ Original by Tony Monroe.
 ```haskell
 Usage:
 
-runhaskell cowsay.hs <options > < message >
+runhaskell cowsay.hs < options > < message >
 ```
 
 Flags:

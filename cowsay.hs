@@ -83,6 +83,7 @@ rewriteCow opts cowPs = map (\x -> rewriteLine opts x) (filtered cowPs)
         filtered lns = init $ filter validLine lns
 
 validLine :: String -> Bool
+validLine [] = True
 validLine (x:xs)
     | x `notElem` "$#"      = True
     | otherwise             = False
