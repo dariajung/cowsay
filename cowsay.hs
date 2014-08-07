@@ -5,46 +5,77 @@ import System.Environment
 import Control.Monad
 import Data.List
 import Data.List.Split
+import System.Console.GetOpt
+import Data.Maybe
 
-data Options = Options {
-    oThought :: String,
-    oEyes :: String,
-    oTongue :: String,
-    oWidth :: Int,
-    oFile :: String
-} deriving (Show)
+data Options = Options 
+    { oThought :: String
+    , oEyes :: String
+    , oTongue :: String
+    , oWidth :: Int
+    , oFile :: String
+    , oList :: Bool } 
+    deriving Show
 
 defaults :: Options
-defaults = Options {
-    oThought = "\\",
-    oEyes = "oo",
-    oTongue = "  ",
-    oWidth = 40,
-    oFile = "default"
-}
+defaults = Options 
+    { oThought = "\\"
+    , oEyes = "oo"
+    , oTongue = "  "
+    , oWidth = 40
+    , oFile = "default" 
+    , oList = False }
 
+options :: [OptDescr (Options -> Options)]
+options =
+    [ Option ['l']      ["list"]        (NoArg showListCows)            "Lists available cows"
+    , Option ['e']      ["eyes"]        (ReqArg setEyes "EYES")         "Set cow's eyes"
+    , Option ['T']      ["tongue"]      (ReqArg setTongue "TONGUE")     "Set cow's tongue"
+    , Option ['W']      ["Width"]       (ReqArg setWidth "WIDTH")       "Bubble width"
+    , Option ['f']      ["File"]        (ReqArg setFilePath "FILE")     "Set cow file"
+    ]
+    where
+        showListCows opt = opt { oList = True }
+        setEyes eyes opt = opt { oEyes = take 2 eyes }
+        setTongue t opt = opt { oTongue = take 2 t }
+        setWidth w opt = opt { oWidth = (read w :: Int) }
+        setFilePath fp opt = opt { oFile = fp }
+
+getOpts :: [Options -> Options] -> Options
+getOpts = foldl (flip id) defaults
+
+main :: IO ()
 main = do
     args <- getArgs
     progName <- getProgName
-    case (length args) of 
-        0       -> putStrLn $ "Usage: " ++ progName ++ " < message >"
-        _       -> runProg defaults (head args)
+
+    case getOpt Permute options args of
+        (o, n, [])  -> runProg (getOpts o) (concat n)
+        _           -> putStrLn $ usageInfo ("Usage: " ++ progName ++ " < option > < message >") options
 
 runProg :: Options -> String -> IO ()
-runProg opts thought = do
-    cow <- readFile ("cows/default.cow")
+runProg opts thought
+    | oList opts        = listAllCows
+    | otherwise         = outputCow opts thought
+    
+outputCow :: Options -> String -> IO ()
+outputCow opts thought = do
+    cow <- readFile ("cows/" ++ (oFile opts) ++ ".cow")
     let fragCow = lines cow
-        rewritten = rewriteCow defaults fragCow
-    putStrLn $ buildBubble thought (oWidth opts)
+        rewritten = rewriteCow opts fragCow
+        nullMsg = "Cow wants a message! Mooooo. Use -h for all options."
+        _thought = if null thought then nullMsg else thought
+    putStrLn $ buildBubble _thought (oWidth opts)
     mapM_ putStrLn rewritten
 
-getAll = do
+listAllCows :: IO ()
+listAllCows = do
     files <- getDirectoryContents "cows"
     mapM_ putStrLn (filepaths files)
 
     where 
         listFiles fs = sort $ filter (isSuffixOf ".cow") fs
-        filepaths fs = map (\x -> "cows/" ++ x) (listFiles fs)
+        filepaths fs = map (\x -> "- " ++ (take (length x - 4) x)) (listFiles fs)
 
 rewriteCow :: Options -> [String] -> [String]
 rewriteCow opts cowPs = map (\x -> rewriteLine opts x) (filtered cowPs)
