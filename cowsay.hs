@@ -133,7 +133,7 @@ normalize ln maxL
 
 textWrap :: String -> Int -> [String]
 textWrap [] _ = []
-textWrap str maxL = drop 1 $ reverse $ genSent zipped 0 [] [[]] maxL
+textWrap str maxL = reverse $ genSent zipped 0 [] [] maxL
     where
         _words = splitOn " " str
         zipped = zip (map (\x -> length x) _words) _words
